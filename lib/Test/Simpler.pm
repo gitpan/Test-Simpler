@@ -5,7 +5,7 @@ use strict;
 use autodie;
 use 5.014;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000004';
 
 use PadWalker  qw< peek_my peek_our >;
 use Data::Dump qw< dump >;
@@ -246,7 +246,7 @@ Test::Simpler - Simpler than Test::Simple; more powerful than Test::More
 
 =head1 VERSION
 
-This document describes Test::Simpler version 0.000002
+This document describes Test::Simpler version 0.000004
 
 
 =head1 SYNOPSIS

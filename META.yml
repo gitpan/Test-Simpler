@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Test-Simpler
-version:            0.000002
+version:            0.000004
 abstract:           Simpler than Test::Simple; more powerful than Test::More
 author:
     - Damian Conway <DCONWAY@CPAN.org>
@@ -11,7 +11,11 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Test::More:  0
+    Data::Dump:           0
+    PadWalker:            0
+    PPI:                  0
+    Test::Builder::Module:  0
+    Test::More:           0
 no_index:
     directory:
         - t

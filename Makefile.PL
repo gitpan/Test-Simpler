@@ -10,7 +10,11 @@ WriteMakefile(
     PL_FILES            => {},
     LICENSE             => 'perl',
     PREREQ_PM => {
-        'Test::More' => 0,
+        'Test::More'            => 0,
+        'Test::Builder::Module' => 0,
+        'PadWalker'             => 0,
+        'Data::Dump'            => 0,
+        'PPI'                   => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Test-Simpler-*' },

@@ -7,3 +7,10 @@ Revision history for Test-Simpler
 0.000002  Wed Jul 18 14:11:32 2012
 
     First public release
+
+
+
+0.000004  Mon Aug  6 07:19:24 2012
+
+    - Added prereq modules to Makefile.PL
+      (Thanks Andreas)
