@@ -8,7 +8,11 @@ my $builder = Module::Build->new(
     dist_author         => 'Damian Conway <DCONWAY@CPAN.org>',
     dist_version_from   => 'lib/Test/Simpler.pm',
     requires => {
-        'Test::More' => 0,
+        'Test::More'            => 0,
+        'Test::Builder::Module' => 0,
+        'PadWalker'             => 0,
+        'Data::Dump'            => 0,
+        'PPI'                   => 0,
     },
     add_to_cleanup      => [ 'Test-Simpler-*' ],
 );

@@ -14,3 +14,8 @@ Revision history for Test-Simpler
 
     - Added prereq modules to Makefile.PL
       (Thanks Andreas)
+
+
+0.000005  Sat Feb 23 23:50:10 2013
+
+    - Added prereq modules to Build.PL
