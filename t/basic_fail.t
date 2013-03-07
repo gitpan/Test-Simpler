@@ -2,7 +2,7 @@
 use 5.014; use warnings; use autodie;
 
 use Test::More;
-use Test::Simpler tests => 5;
+use Test::Simpler tests => 7;
 
 TODO:{
     local $TODO = 'These are supposed to fail';
@@ -44,5 +44,15 @@ TODO:{
         sub got { length shift }
 
         ok( got(q{}) != 0 );
+    }
+
+    {
+        { package Quote; sub asx_code { 'QBE' } }
+        my $qbe = bless {}, 'Quote';
+
+        my $methname = 'asx_code';
+
+        ok $qbe->asx_code    eq 'EBQ' => 'get asx_code';
+        ok $qbe->$methname() eq 'EBQ' => 'get methname';
     }
 }

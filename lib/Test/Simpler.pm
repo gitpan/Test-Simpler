@@ -5,7 +5,7 @@ use strict;
 use autodie;
 use 5.014;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use PadWalker  qw< peek_my peek_our >;
 use Data::Dump qw< dump >;
@@ -21,6 +21,9 @@ our %EXPORT_TAGS = ();
 sub ok($;$) {
     my $outcome = shift;
     my $desc    = @_ ? "@_" : undef;
+
+    # Grab the upscope variables...
+    my %value_for = ( %{peek_our(1)}, %{peek_my(1)} );
 
     # Cache for source code...
     state %source;
@@ -130,11 +133,51 @@ sub ok($;$) {
         my $symbol_source = $symbol->content;
         my $next_symbol   = $symbol;
 
+        ACCUMULATE_SYMBOL:
         while ($next_symbol = $next_symbol->snext_sibling) {
-            last if ! $next_symbol->isa('PPI::Structure::Subscript')
-                 && $next_symbol->content ne '->';
-            $subscript     .= $next_symbol->content;
-            $symbol_source .= $next_symbol->content;
+            # A simple array or hash look-up???
+            if ($next_symbol->isa('PPI::Structure::Subscript')) {
+                $subscript     .= $next_symbol->content;
+                $symbol_source .= $next_symbol->content;
+            }
+
+            # A dereferenced look-up or method call???
+            elsif ($next_symbol->content eq '->') {
+                # What's after the arrow???
+                $next_symbol = $next_symbol->snext_sibling;
+
+                # Is it a subscript??? Then deal with it on the next loop...
+                if ($next_symbol->isa('PPI::Structure::Subscript')) {
+                    redo ACCUMULATE_SYMBOL;
+                }
+
+                # Is it a method call??? Then deal with it here...
+                elsif ($next_symbol->isa('PPI::Token::Word') || $next_symbol->isa('PPI::Token::Symbol') ) {
+                    $DB::single = 1;
+                    my $methname = $next_symbol->content;
+                    if ($next_symbol->isa('PPI::Token::Symbol') && $value_for{$next_symbol->content}) {
+                        $methname = ${ $value_for{$next_symbol->content} }
+                    }
+
+                    # Save the arrow and method name...
+                    $subscript     .= '->' . $methname;
+                    $symbol_source .= '->' . $next_symbol->content;
+
+                    # Look for a trailing argument list...
+                    $next_symbol = $next_symbol->snext_sibling;
+
+                    # Ignore this symbol if it's not a list...
+                    redo ACCUMULATE_SYMBOL
+                        if ! $next_symbol->isa('PPI::Structure::List');
+
+                    # Otherwise, keep the list and continue...
+                    $subscript     .= $next_symbol->content;
+                    $symbol_source .= $next_symbol->content;
+                }
+            }
+            else {
+                last ACCUMULATE_SYMBOL;
+            }
         }
         my $symbol_name = $symbol->symbol;
         my $symbol_lookup = $symbol->symbol_type eq '$'
@@ -152,9 +195,6 @@ sub ok($;$) {
     }
 
     my $symlen = max map { length $_ } @symbol_names;
-
-    # Grab the upscope variables...
-    my %value_for = ( %{peek_our(1)}, %{peek_my(1)} );
 
     # Now report the test...
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -246,7 +286,7 @@ Test::Simpler - Simpler than Test::Simple; more powerful than Test::More
 
 =head1 VERSION
 
-This document describes Test::Simpler version 0.000005
+This document describes Test::Simpler version 0.000006
 
 
 =head1 SYNOPSIS
@@ -298,7 +338,7 @@ would get:
     #   But was false because:
     #       $result      --> 1
     #       $expected[0] --> 1
-    # 
+    #
     ok 2 - $result eq $expected[0]
     not ok 3 - $result == $expected->[0]->{a}[0]
     #   Failed test at demo/ts_ok-er.pl line 16
@@ -308,7 +348,7 @@ would get:
     #   Because:
     #       $result                --> 1
     #       $expected->[0]->{a}[0] --> undef
-    # 
+    #
     ok 4 - $result ~~ $expected[0]
     not ok 5 - $result !~ $expected[0]
     #   Failed test at demo/ts_ok-er.pl line 18
@@ -318,7 +358,7 @@ would get:
     #   Because:
     #       $result      --> 1
     #       $expected[0] --> 1
-    # 
+    #
     not ok 6 - $result > double($hash{'b b'})
     #   Failed test at demo/ts_ok-er.pl line 19
     #       $result
@@ -327,11 +367,11 @@ would get:
     #   Because:
     #       $result       --> 1
     #       $hash{'half'} --> 2
-    # 
+    #
     # Looks like you failed 4 tests of 6.
 
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 The module's API is identical to Test::Simple. See that module's
 documentation for details.

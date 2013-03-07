@@ -19,3 +19,9 @@ Revision history for Test-Simpler
 0.000005  Sat Feb 23 23:50:10 2013
 
     - Added prereq modules to Build.PL
+
+
+0.000006  Thu Mar  7 17:13:59 2013
+
+    - Improved handling of method calls in tests
+      (Thanks Anthony!)

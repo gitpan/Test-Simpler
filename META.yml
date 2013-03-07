@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Test-Simpler
-version:            0.000005
+version:            0.000006
 abstract:           Simpler than Test::Simple; more powerful than Test::More
 author:
     - Damian Conway <DCONWAY@CPAN.org>
