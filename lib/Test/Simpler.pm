@@ -5,7 +5,7 @@ use strict;
 use autodie;
 use 5.014;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use PadWalker  qw< peek_my peek_our >;
 use Data::Dump qw< dump >;
@@ -153,7 +153,6 @@ sub ok($;$) {
 
                 # Is it a method call??? Then deal with it here...
                 elsif ($next_symbol->isa('PPI::Token::Word') || $next_symbol->isa('PPI::Token::Symbol') ) {
-                    $DB::single = 1;
                     my $methname = $next_symbol->content;
                     if ($next_symbol->isa('PPI::Token::Symbol') && $value_for{$next_symbol->content}) {
                         $methname = ${ $value_for{$next_symbol->content} }
@@ -257,12 +256,12 @@ sub _rebuild_code {
 sub _tidy_values {
     my ($ref) = @_;
 
-    given (ref $ref) {
-        when ('ARRAY')  { return dump @{$ref} }
-        when ('HASH')   { return dump($ref) =~ s/^{/(/r =~ s/}$/)/r }
-        when ('SCALAR') { return dump ${$ref} }
-        default         { return dump $ref    }
-    }
+    my $type = ref($ref);
+
+    return  $type eq 'ARRAY'  ?  dump @{$ref}
+         :  $type eq 'HASH'   ?  dump($ref) =~ s/^{/(/r =~ s/}$/)/r
+         :  $type eq 'SCALAR' ?  dump ${$ref}
+         :                       dump $ref;
 }
 
 sub _get_symbols {
@@ -286,7 +285,7 @@ Test::Simpler - Simpler than Test::Simple; more powerful than Test::More
 
 =head1 VERSION
 
-This document describes Test::Simpler version 0.000006
+This document describes Test::Simpler version 0.000007
 
 
 =head1 SYNOPSIS

@@ -25,3 +25,8 @@ Revision history for Test-Simpler
 
     - Improved handling of method calls in tests
       (Thanks Anthony!)
+
+
+0.000007  Mon Nov 11 07:02:55 2013
+
+    - Lobotomized for Perl 5.18 compatibility
